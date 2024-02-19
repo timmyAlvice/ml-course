@@ -75,7 +75,7 @@ class KNearestNeighbor:
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-                dists[i, j] = np.sum((self.X_train - X)**2) ** 0.5
+                dists[i, j] = np.sum((self.X_train[j] - X[i])**2) ** 0.5
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -97,7 +97,8 @@ class KNearestNeighbor:
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            dists[i, :] = np.sum((self.X_train - X[i])**2) ** 0.5
+            X_i = np.kron(np.ones((num_train, 1)), X[i])
+            dists[i, :] = np.sum((self.X_train - X_i)**2, axis=1) ** 0.5
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -125,7 +126,14 @@ class KNearestNeighbor:
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        
+        # X_test_kron = np.kron(X, np.ones((num_train, 1)))
+        # X_train_kron = np.kron(np.ones((num_test, 1)), self.X_train)
+        # diffs = (X[:, np.newaxis] - self.X_train).reshape(-1, X.shape[1])
+        dists = np.sqrt(np.sum((X[:, np.newaxis] - self.X_train) ** 2, axis=2))
+        # dists = np.sum(diffs**2, axis=1) ** 0.5
+        # dists = np.expand_dims(dists, axis=1)
+        dists = np.reshape(dists, (num_test, num_train))
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -155,7 +163,8 @@ class KNearestNeighbor:
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            neares_inds = np.argsort(dists[i])[:k]
+            closest_y = self.y_train[neares_inds]
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
             # TODO:                                                                 #
@@ -165,7 +174,10 @@ class KNearestNeighbor:
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            pass
+            unique_values, counts = np.unique(closest_y, return_counts=True)
+            max_count_index = np.argmax(counts)
+            mode_value = unique_values[max_count_index]
+            y_pred[i] = mode_value
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred

@@ -87,8 +87,16 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        axis = 0 if w.ndim > 1 else 1
-        return 2*np.mean(X @ w - Y)
+        n_samples, n_features = X.shape
+        target_dim = 1 if Y.ndim == 1 else Y.shape[1]
+        
+        Y_pred = X @ w
+        
+        mse_derivative = 2 * (X.T @ (Y_pred-Y)) / n_samples
+        if target_dim > 1:
+            mse_derivative /= target_dim
+            
+        return mse_derivative
 
     @staticmethod
     def mae_derivative(X, Y, w):
@@ -107,8 +115,16 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        axis = 0 if w.ndim > 1 else 1
-        return np.mean((X @ w - Y) / np.abs(X @ w - Y)) 
+        n_samples, n_features = X.shape
+        target_dim = 1 if Y.ndim == 1 else Y.shape[1]
+        
+        Y_pred = X @ w
+        
+        mae_derivative = (X.T @ np.sign(Y_pred-Y)) / n_samples
+        if target_dim > 1:
+            mae_derivative /= target_dim
+        
+        return mae_derivative
 
     @staticmethod
     def l2_reg_derivative(w):
@@ -121,7 +137,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return 2*np.sum(w)
+        return 2*w
 
     @staticmethod
     def l1_reg_derivative(w):
@@ -135,7 +151,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return np.sum(w / np.abs(w))
+        return np.sign(w)
 
     @staticmethod
     def no_reg_derivative(w):
