@@ -126,14 +126,7 @@ class KNearestNeighbor:
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        
-        # X_test_kron = np.kron(X, np.ones((num_train, 1)))
-        # X_train_kron = np.kron(np.ones((num_test, 1)), self.X_train)
-        # diffs = (X[:, np.newaxis] - self.X_train).reshape(-1, X.shape[1])
         dists = np.sqrt(np.sum((X[:, np.newaxis] - self.X_train) ** 2, axis=2))
-        # dists = np.sum(diffs**2, axis=1) ** 0.5
-        # dists = np.expand_dims(dists, axis=1)
-        dists = np.reshape(dists, (num_test, num_train))
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
